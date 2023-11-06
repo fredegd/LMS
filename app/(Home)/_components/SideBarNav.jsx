@@ -37,7 +37,7 @@ export default function SideBarNav() {
       </div>
       <div className="flex flex-col">
         {menuList.map((item, index) => (
-          <div className={`flex gap-2 items-center p-5 px-6 text-gray-500
+          <div key={index}className={`flex gap-2 items-center p-5 px-6 text-gray-500
           hover:bg-gray-100 cursor-pointer
           ${activeIndex === index ? "bg-purple-100 text-purple-900" : ""}`}
            onClick={(()=>setActiveIndex(index))}>
