@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import SearchBar from "./SearchBar";
 
-
 export default function Header() {
   const { user } = useUser();
   const router = useRouter();
@@ -13,9 +12,13 @@ export default function Header() {
   }, [user]);
 
   return (
-    <div className="ml-20 md:ml-64 p-5 border-b flex items-center justify-between">
+    <div className="ml-0 sm:ml-24 md:ml-64 p-5 border-b flex items-center justify-between">
       <SearchBar />
-      {!user ? <button onClick={()=>router.push('/sign-in')}>Login</button> : <UserButton/>}
+      {!user ? (
+        <button onClick={() => router.push("/sign-in")}>Login</button>
+      ) : (
+        <UserButton />
+      )}
     </div>
   );
 }

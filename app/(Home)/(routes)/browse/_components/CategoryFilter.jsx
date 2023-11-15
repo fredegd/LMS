@@ -35,8 +35,12 @@ export default function CategoryFilter() {
       {filterOptions.map((item, index) => {
         return (
           <div key={index}>
-            <button className={`border p-2 px-4 text-sm rounded-md hover:border-purple-800 hover:bg-gray-200 ${activeIndex==index?'bg-purple-50 text-purple-500':null}`}
-            onClick={()=>setActiveIndex(index)}>
+            <button
+              className={`border p-2 px-4 text-sm rounded-md hover:border-orange-500 hover:bg-gray-150 ${
+                activeIndex == index ? "bg-orange-50 text-orange-500" : null
+              }`}
+              onClick={() => setActiveIndex(index)}
+            >
               <h2 htmlFor={item.id}>{item.name}</h2>
             </button>
           </div>
@@ -45,3 +49,4 @@ export default function CategoryFilter() {
     </div>
   );
 }
+ 
