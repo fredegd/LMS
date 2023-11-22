@@ -5,7 +5,7 @@ import Header from "../_components/Header";
 export default function HomeLayout({ children }) {
   return (
     <div>
-      <div className="h-full  flex flex-col fixed  inset-y-0 z-50 hidden sm:block">
+      <div className="h-full hidden  sm:flex flex-col fixed  inset-y-0 z-50 ">
         <SideBarNav />
       </div>
       <Header />
