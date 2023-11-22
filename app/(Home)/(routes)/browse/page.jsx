@@ -9,15 +9,15 @@ function Browse() {
   const [items, setItems] = useState();
   useEffect(() => {
     getList().then((res) => {
-      setItems(res.snippets);
-      console.log(res.snippets, "is the response");
+      setItems(res.snippetCollections);
+      console.log(res.snippetCollections, "is the response");
     });
   }, []);
 
   return (
-    <div >
+    <div>
       <CategoryFilter />
-      {items ? <ItemList items={items} /> : null}
+      {items ? <ItemList items={items} /> : <div className="flex justify-center items-center h-screen"><h2>Loading...</h2></div>}
     </div>
   );
 }
