@@ -25,7 +25,7 @@ const result = await request(MASTER_URL, query)
 export const getItemById = async(id) => {
   const query = gql` 
   query tutorial {
-    snippetCollection(where: {id: "clp051zrf30ce0bw8vjowqj0a"}) {
+    snippetCollection(where: {id: "${id}"}) {
       chapterSection {
         ... on Chapter {
           id

@@ -4,11 +4,12 @@ import React, { useState, useEffect } from "react";
 import { getItemById } from "../../../../_services/index";
 import CoverPage from "./_components/CoverPage";
 import ItemDetails from "./_components/ItemDetails";
+import EnrollOptions from "./_components/EnrollOptions";
 
 export default function ItemPreview({ params }) {
   const [item, setItem] = useState({});
   useEffect(() => {
-    params.itemId?getItem(params.itemId):null;
+    params.itemId ? getItem(params.itemId) : null;
   }, []);
 
   const getItem = () => {
@@ -18,21 +19,19 @@ export default function ItemPreview({ params }) {
     });
   };
 
-  return (
+  return item ? (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3">
-        {item ? (
-          <div className="col-span-2">
-            <CoverPage data={item.banner.url} />
-            <ItemDetails item={item} />
-          </div>
-        ) : (
-          <div className="col-span-2">Loading...</div>
-        )}
-        <div className="h-screen flex flex-col w-64 border shadow-sm ">
-          enroll options
+        <div className="col-span-2">
+          <CoverPage data={item} />
+          <ItemDetails item={item} />
         </div>
+       <EnrollOptions/>
       </div>
+    </div>
+  ) : (
+    <div className="flex justify-center items-center h-screen">
+      <h2>Loading...</h2>
     </div>
   );
 }
