@@ -11,14 +11,10 @@ export default function ItemDetails(item) {
       {item && (
         <div>
           bookIcon{" "}
-          {item ? (
-            <h2 className="text-[12px] text-gray-400">
-              {item.item.chapterSection?.length}
-              {" chapters"}
-            </h2>
-          ) : (
-            <div>loading</div>
-          )}
+          <h2 className="text-[12px] text-gray-400">
+            {item.item.chapterSection?.length}
+            {" chapters"}
+          </h2>
         </div>
       )}
       <h3>{item.item.description}</h3>

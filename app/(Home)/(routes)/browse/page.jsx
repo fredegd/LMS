@@ -17,7 +17,13 @@ function Browse() {
   return (
     <div>
       <CategoryFilter />
-      {items ? <ItemList items={items} /> : <div className="flex justify-center items-center h-screen"><h2>Loading...</h2></div>}
+      {items ? (
+        <ItemList items={items} />
+      ) : (
+        <div className="flex justify-center items-center h-screen">
+          <h2>Loading...</h2>
+        </div>
+      )}
     </div>
   );
 }
