@@ -34,27 +34,27 @@ export default function SideBarNav() {
   const [activeIndex, setActiveIndex] = useState(0);
   return (
     <div className="h-full  md:w-64 xs:w-32  b-white border-r flex flex-col overflow-y-auto shadow-md ">
-      <div className="flex flex-col items-center justify-center h-16 border-b">
-        <Image
-          src={"/logo.svg"}
-          className="w-3/4 hidden sm:block md:hidden"
-          alt={"logo"}
-          width={100}
-          height={70}
-        />
-        <Image
-          src={"/cs_logo.svg"}
-          className="w-11/12 hidden md:block"
-          alt={"logo"}
-          width={100}
-          height={70}
-        />
-      </div>
+      <Link href={'/'}>
+        <div className="flex flex-col items-center justify-center h-16 border-b">
+          <Image
+            src={"/logo.svg"}
+            className="w-3/4 hidden sm:block md:hidden"
+            alt={"logo"}
+            width={100}
+            height={70}
+          />
+          <Image
+            src={"/cs_logo.svg"}
+            className="w-11/12 hidden md:block"
+            alt={"logo"}
+            width={100}
+            height={70}
+          />
+        </div>
+      </Link>
       <div className="flex flex-col">
         {menuList.map((item, index) => (
-          <Link href={item.path} passHref={true}
-            key={index}
-          >
+          <Link href={item.path} passHref={true} key={index}>
             <div
               className={`flex gap-2 items-center p-5 px-6 text-gray-500
             hover:bg-gray-100 cursor-pointer
