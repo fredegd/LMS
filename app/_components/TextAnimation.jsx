@@ -6,26 +6,36 @@ export default function TextAnimation() {
     const textContainer = document.getElementById("textContainer");
     const res = 20;
     const step = 1;
+    // const str1 ="Hello World !  ";
     const str1 =
-    "A        Unique        Selection        of        Useful        CODE        SNIPPETS          &        RESOURCES               ";
+      "A        Unique        Selection        of        Useful        CODE        SNIPPETS          &        RESOURCES               ";
 
     let count = 0;
     let toBeCleared = false;
 
     const iter = setInterval(() => {
       textContainer.innerHTML = "";
-      for (let j = 0; j <= res*1; j += step) {
+      for (let j = 0; j <= res * 1; j += step) {
         const row = document.createElement("div");
         row.classList.add("flex");
         for (let i = 0; i <= res * 6; i += step) {
           const charIndex =
             Math.floor(
               i +
-                (j-res/2) *
+                (j - res / 2) *
                   Math.sin(
-                    radians((i-res*2) * Math.cos(radians(count+90))*0.4 + (count % 360)) *
+                    radians(
+                      (i - res * 2) * Math.cos(radians(count + 90)) * 0.4 +
+                        (count % 360)
+                    ) *
                       10 *
-                      Math.cos(radians(0.025 * (j-res/2) * (i-res*2) * 0.05 + (count % 360)))*2
+                      Math.cos(
+                        radians(
+                          0.025 * (j - res / 2) * (i - res * 2) * 0.05 +
+                            (count % 360)
+                        )
+                      ) *
+                      2
                   ) +
                 count * 1
             ) %
@@ -59,9 +69,8 @@ export default function TextAnimation() {
             0,
             255
           );
+          // character.classList.add("text-[#50d71e]"); //("character
           character.style.color = `rgb(${gray},${gray / 3},${gray / 10})`;
-          character.style.fontSize = `${100 / res / 2}vw`;
-          character.style.letterSpacing = `${100 / res / 20}vw`;
         });
       });
       toBeCleared = true;
@@ -85,5 +94,5 @@ export default function TextAnimation() {
     return degrees * (pi / 180);
   }
 
-  return <div id="textContainer" className="flex flex-col items-center text-white"></div>;
+  return <div id="textContainer" className="flex flex-col items-center "></div>;
 }

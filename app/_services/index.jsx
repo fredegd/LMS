@@ -8,7 +8,7 @@ query itemPreview {
   snippetCollections {
     id
     title
-    tag
+    tags
     banner {
       url
     }
@@ -30,15 +30,17 @@ export const getItemById = async(id) => {
         ... on Chapter {
           id
           title
-          descriptionMd
+          chapterDescription
+          chapterSnippet
           banner {
             url
           }
         }
       }
       description
+      level
       title
-      tag
+      tags
       id
       banner {
         url
