@@ -12,7 +12,7 @@ export default function Home() {
       </div>
 
       <UserButton afterSignOutUrl="/" />
-      <div className="w-full flex items-center justify-center relative">
+      <div className="w-full flex flex-col items-center justify-center relative">
         <TextAnimation />
         <EnterButton />
       </div>
