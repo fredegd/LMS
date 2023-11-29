@@ -1,7 +1,7 @@
 import Markdown from "react-markdown";
 
 export default function Chapter({ content }) {
-  const markdown = content.chapterSnippet;
+  const markdownCode = content.chapterSnippet;
   return (
     <div className="my-10 flex flex-col items-start ">
       <h1 className=" font-bold text-[2rem] text-center mb-6">
@@ -20,8 +20,8 @@ export default function Chapter({ content }) {
         </div>
       ) : null}
       <div className=" my-10 flex flex-col w-full justify-start items-center  overflow-auto">
-        <div className="self-start min-w-full  px-5 py-3 bg-slate-200 ">
-          <Markdown>{markdown}</Markdown>
+        <div className="self-start min-w-full  px-5 py-4 bg-slate-200 rounded-md">
+          <Markdown>{markdownCode}</Markdown>
         </div>
       </div>
       <hr />
