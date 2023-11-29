@@ -1,10 +1,12 @@
 "use client";
 import React, { useEffect } from "react";
+import EnterButton from "./EnterButton";
+
 
 export default function TextAnimation() {
   useEffect(() => {
     const textContainer = document.getElementById("textContainer");
-    const res = 20;
+    const res = 10;
     const step = 1;
     // const str1 ="Hello World !  ";
     const str1 =
@@ -40,9 +42,10 @@ export default function TextAnimation() {
                 count * 1
             ) %
             (str1.length - 1);
-          const character = document.createElement("span");
-          character.classList.add("character"); //("character
-          character.classList.add("text-[1.6vw]"); //("character
+          const character = document.createElement("h1");
+          character.classList.add("character");
+          character.classList.add("text-[2.5vw]");
+          character.classList.add("md:text-[2.4vw]");
           character.textContent =
             str1.charAt(charIndex) == " " ? "_" : str1.charAt(charIndex);
           row.appendChild(character);
@@ -94,5 +97,12 @@ export default function TextAnimation() {
     return degrees * (pi / 180);
   }
 
-  return <div id="textContainer" className="flex flex-col items-center "></div>;
+  return (
+
+      <div
+        id="textContainer"
+        className="w-full flex flex-col items-center border border-red-500"
+      ></div>
+
+  );
 }
