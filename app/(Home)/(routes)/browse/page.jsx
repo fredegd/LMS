@@ -7,16 +7,46 @@ import ItemList from "./_components/ItemList";
 
 function Browse() {
   const [items, setItems] = useState();
+  const [filters, setFilters] = useState();
+  const [coursesOrg, setCoursesOrg] = useState([]);
   useEffect(() => {
     getList().then((res) => {
       setItems(res.snippetCollections);
-      console.log(res.snippetCollections, "is the response");
+
+      setCoursesOrg(res.snippetCollections);
+
+      const tags = new Set();
+      tags.add("all tags");
+      res.snippetCollections.forEach((snippet) => {
+        snippet.tags.forEach((tag) => {
+          tags.add(tag);
+        });
+      });
+      let uniqueTag = Array.from(tags);
+      setFilters(uniqueTag);
     });
   }, []);
 
+  const filterCourse = (category) => {
+    if (category === "all tags") {
+      setItems(coursesOrg);
+      return;
+    }
+    const filtered = coursesOrg.filter((item) => {
+      return item.tags.includes(category);
+    });
+
+    setItems(filtered);
+  };
+
   return (
     <div>
-      <CategoryFilter />
+      {filters ? (
+        <CategoryFilter
+          filters={filters}
+          selectedCategory={(category) => filterCourse(category)}
+        />
+      ) : null}
       {items ? (
         <ItemList items={items} />
       ) : (
