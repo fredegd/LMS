@@ -11,7 +11,7 @@ export default function ItemList({ items }) {
 
       {
         // const linkTo = "/item-preview/" + item.description.replace(/\s+/g, '-').toLowerCase();//.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-        const linkTo = `/item-preview/${item.id}`
+        const linkTo = `/item-display/${item.id}`
         return(
         <Link href={linkTo} key={index}>
           <div className="border rounded-md p-2 cursor-pointer shadow-lg hover:shadow-orange-500">

@@ -4,7 +4,6 @@ export default function CoverPage({ data }) {
 
   return (
     <div>
-      <h2 className="text-gray-400 mb-3">Preview:</h2>
       {data?.banner?.url ? (
         <div className="w-full flex justify-center">
           <img src={data.banner.url} alt={data.title} 

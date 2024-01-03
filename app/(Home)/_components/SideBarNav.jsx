@@ -22,7 +22,8 @@ export default function SideBarNav() {
       icon: Search,
       path: "/browse",
     },
-    //                                | |
+    //                               _|  |_
+    //                               \    /
     // here comes the protected routes \/
     {
       id: 2,
