@@ -10,23 +10,24 @@ export default function ItemList({ items }) {
       {items.map((item, index) => 
 
       {
-        // const linkTo = "/item-preview/" + item.description.replace(/\s+/g, '-').toLowerCase();//.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-        const linkTo = `/item-preview/${item.id}`
-        return(
-        <Link href={linkTo} key={index}>
-          <div className="border rounded-md p-2 cursor-pointer shadow-lg hover:shadow-orange-500">
-            <Image
-              className="w-full"
-              src={item.banner.url}
-              alt={item.title}
-              width={400}
-              height={0}
-            />
-            <h1 className="text-[1.5rem] font-medium">{item.title}</h1>
-            <p>{item.description}</p>
-          </div>
-        </Link>
-      )})}
+        // const linkTo = "/item-display/" + item.description.replace(/\s+/g, '-').toLowerCase();//.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+        const linkTo = `/item-display/${item.id}`;
+        return (
+          <Link href={linkTo} key={index}>
+            <div className="border rounded-md p-2 cursor-pointer shadow-lg hover:shadow-orange-500">
+              <Image
+                className="w-full"
+                src={item.banner.url}
+                alt={item.title}
+                width={400}
+                height={0}
+              />
+              <h1 className="text-[1.5rem] font-medium">{item.title}</h1>
+              <p>{item.description}</p>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

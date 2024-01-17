@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { getItemById } from "../../../../_services/index";
 import CoverPage from "./_components/CoverPage";
 import ItemDetails from "./_components/ItemDetails";
-import EnrollOptions from "./_components/EnrollOptions";
+// import EnrollOptions from "./_components/EnrollOptions";
 
 export default function ItemPreview({ params }) {
   const [item, setItem] = useState({});
@@ -29,8 +29,7 @@ export default function ItemPreview({ params }) {
           </div>
         )}
         <div className="col-span-3 xl:col-span-1">
-
-        <EnrollOptions />
+          {/* <EnrollOptions /> */}
         </div>
       </div>
     </div>
