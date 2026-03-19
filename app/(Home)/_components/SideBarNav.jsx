@@ -1,90 +1,81 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useState } from "react";
-import { Search, Layout, Shield, Mail } from "lucide-react";
+
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { Search, Layout, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function SideBarNav() {
-  const { user } = useUser();
+const menuList = [
+  { id: 1, name: "Browse", icon: Search, path: "/browse" },
+  { id: 2, name: "Dashboard", icon: Layout, path: "/dashboard", protected: true },
+];
 
-  const router = useRouter();
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+export default function SideBarNav({ closeMobile }) {
+  const { data: session } = useSession();
+  const pathname = usePathname();
+  const user = session?.user;
 
-  const menuList = [
-    {
-      id: 1,
-      name: "Browse",
-      icon: Search,
-      path: "/browse",
-    },
-    //                                | |
-    // here comes the protected routes \/
-    {
-      id: 2,
-      name: "Dashboard",
-      icon: Layout,
-      path: "/dashboard",
-    },
-
-    // {
-    //   id: 3,
-    //   name: "Newsletter",
-    //   icon: Mail,
-    //   path: "/newsletter",
-    // },
-
-    // {
-    //   id: 3,
-    //   name: "Upgrade",
-    //   icon: Shield,
-    //   path: "/upgrade",
-    // },
-  ];
-  const [activeIndex, setActiveIndex] = useState(0);
   return (
-    <div className="h-full  md:w-64 xs:w-32  b-white border-r flex flex-col overflow-y-auto shadow-md ">
-      <Link href={"/"}>
-        <div className="flex flex-col items-center justify-center h-16 border-b">
+    <div className="h-full w-full bg-gray-950 flex flex-col overflow-y-auto">
+      {/* Logo area */}
+      <div className="flex items-center justify-between px-3 py-4 border-b border-white/10">
+        <Link href="/" onClick={closeMobile} className="flex items-center gap-2 min-w-0">
           <Image
-            src={"/logo.svg"}
-            className="w-3/4 hidden sm:block md:hidden"
-            alt={"logo"}
-            width={100}
-            height={70}
+            src="/logo.svg"
+            alt="logo"
+            width={32}
+            height={32}
+            className="shrink-0 md:hidden"
+            loading="eager"
           />
           <Image
-            src={"/cs_logo.svg"}
-            className="w-11/12 hidden md:block"
-            alt={"logo"}
-            width={100}
-            height={70}
+            src="/cs_logo.svg"
+            alt="logo"
+            width={130}
+            height={40}
+            className="hidden md:block brightness-0 invert"
+            loading="eager"
           />
-        </div>
-      </Link>
-      <div className="flex flex-col">
-        {menuList.map((item, index) => {
-          // if the user is not logged in and the index is greater than 0 (user routes)
-          // shows nothing else than the Browse button
-          return !user && index > 0 ? null : (
-            <Link href={item.path} passHref={true} key={index}>
-              <div
-                className={`flex gap-2 items-center p-5 px-6 text-gray-500
-                           hover:bg-gray-100 cursor-pointer
-              ${activeIndex === index ? "bg-orange-100 text-orange-500" : ""}`}
-                onClick={() => setActiveIndex(index)}
-              >
-                <item.icon className="h-6 w-6" />
-                <h2 className="md:flex hidden">{item.name}</h2>
-              </div>
+        </Link>
+        {closeMobile && (
+          <button
+            onClick={closeMobile}
+            className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors sm:hidden"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+
+      {/* Navigation links */}
+      <nav className="flex flex-col gap-1 p-2 mt-1">
+        {menuList.map((item) => {
+          if (item.protected && !user) return null;
+
+          const isActive = pathname.startsWith(item.path);
+
+          return (
+            <Link
+              href={item.path}
+              key={item.id}
+              onClick={closeMobile}
+              className={`
+                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                ${isActive
+                  ? "bg-orange-500/15 text-orange-400"
+                  : "text-gray-400 hover:text-gray-100 hover:bg-white/5"
+                }
+              `}
+            >
+              <item.icon className="h-5 w-5 shrink-0" />
+              <span className="hidden md:inline">{item.name}</span>
             </Link>
           );
         })}
-      </div>
+      </nav>
+
+      <div className="mt-auto" />
     </div>
   );
 }

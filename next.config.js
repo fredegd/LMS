@@ -7,7 +7,12 @@ const nextConfig = {
             hostname: 'media.graphassets.com',
             port: '',
             pathname: '/**',
-            // pathname: '/account123/**',
+          },
+          {
+            protocol: 'https',
+            hostname: '**.graphassets.com',
+            port: '',
+            pathname: '/**',
           },
         ],
       },

@@ -1,30 +1,31 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 
 export default function CategoryFilter({ filters, selectedCategory }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const filterOptions = filters.map((item, index) => {
-    return { id: index, name: item, value: item };
-  });
-
   return (
-    <div className="flex flex-wrap gap-5">
-      {filterOptions.map((item, index) => {
+    <div className="flex flex-1 gap-2 overflow-x-auto pb-1 scrollbar-none">
+      {filters.map((filter, index) => {
+        const isActive = activeIndex === index;
         return (
-          <div key={index}>
-            <button
-              className={`border p-2 px-4 text-sm rounded-md hover:border-orange-500 hover:bg-gray-150 ${
-                activeIndex == index ? "bg-orange-50 text-orange-500" : null
-              }`}
-              onClick={() => {
-                setActiveIndex(index);
-                selectedCategory(item.value);
-              }}
-            >
-              <h2 htmlFor={item.id}>{item.name}</h2>
-            </button>
-          </div>
+          <button
+            key={index}
+            className={`
+              shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all
+              ${isActive
+                ? "border-orange-300 bg-orange-50 text-orange-600"
+                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+              }
+            `}
+            onClick={() => {
+              setActiveIndex(index);
+              selectedCategory(filter);
+            }}
+          >
+            {filter}
+          </button>
         );
       })}
     </div>
