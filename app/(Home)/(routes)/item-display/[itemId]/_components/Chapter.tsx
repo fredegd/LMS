@@ -25,7 +25,7 @@ export default function Chapter({ content }: ChapterProps) {
       if (firstBacktick !== -1 && lastBacktick !== -1 && firstBacktick !== lastBacktick) {
         // Find the end of the first line (where the ```language occurs)
         const firstLineEnd = raw.indexOf("\n", firstBacktick);
-        
+
         if (firstLineEnd !== -1 && firstLineEnd < lastBacktick) {
           // Extract everything from after the first line until the last backticks
           cleanSnippet = raw.slice(firstLineEnd + 1, lastBacktick);
@@ -62,7 +62,7 @@ export default function Chapter({ content }: ChapterProps) {
             alt={content.title}
             width={1400}
             height={788}
-            className="w-full h-auto rounded-lg"
+            className="w-full md:w-1/2 h-auto rounded-lg"
           />
         )}
 

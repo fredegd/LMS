@@ -173,7 +173,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
   return (
     <div className="relative">
       {/* Back Button - Fixed but offset from sidebar */}
-      <div className="fixed top-6 left-[calc(var(--sidebar-w)+1.5rem)] z-50">
+      <div className="fixed top-16 left-[calc(var(--sidebar-w)+1.5rem)] z-50">
         <button
           onClick={() => router.back()}
           className="group flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all duration-300"
@@ -187,63 +187,85 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
       <div className="fixed bottom-8 right-8 z-50">
         <button
           onClick={scrollToTop}
-          className={`group flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 hover:shadow-xl hover:border-orange-200 transition-all duration-300 ${
-            showScrollTop ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-90 pointer-events-none"
-          }`}
+          className={`group flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 hover:shadow-xl hover:border-orange-200 transition-all duration-300 ${showScrollTop ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-90 pointer-events-none"
+            }`}
           title="Scroll to Top"
         >
           <ArrowUp className="h-6 w-6 text-gray-600 group-hover:text-orange-600 transition-colors" />
         </button>
       </div>
 
-      <div className="flex gap-8">
-      {/* Main content */}
-      <div className="min-w-0 flex-1 max-w-6xl">
+      {/* Hero Section: Banner + Overlay Title Card */}
+      <div className="relative -mx-4 md:-mx-6 lg:-mx-8 mb-12">
         <CoverPage data={item} />
 
-        {/* Mobile TOC dropdown */}
-        <MobileTOC chapters={chapters} />
+        {/* Responsive Header Card: Overlay on desktop (lg+), stacked on mobile/tablet */}
+        <div
+          className="relative lg:absolute lg:top-12 lg:left-4 m-auto xl:left-12 z-30 
+                     p-6 lg:p-10 rounded-[1.5rem] lg:rounded-[2.5rem] 
+                     bg-white/20 lg:bg-white/25 backdrop-blur-md lg:backdrop-blur-lg 
+                     border border-white/50 shadow-xl lg:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] 
+                     w-full xl:w-5/6 xl:max-w-4xl lg:max-w-3xl
+                     mt-6 lg:mt-0 mx-4 lg:mx-0"
+        >
+          <div className="relative">
+            <h1
+              className="font-extrabold tracking-tight text-gray-900 mb-4 lg:mb-6 leading-tight drop-shadow-sm"
+              style={{ fontSize: "clamp(1.25rem, 3.5vw, 2.75rem)" }}
+            >
+              {item.title}
+            </h1>
 
-        <ItemDetails item={item} />
+            <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+              <div className="flex items-center gap-1.5 rounded-full bg-white/40 border border-white/60 px-3 py-1.5 lg:px-4 lg:py-2 text-[10px] lg:text-xs font-semibold text-gray-700 shadow-sm">
+                <Book className="h-3 w-3 lg:h-4 lg:w-4 text-orange-600" />
+                <span>{chapters.length} chapters</span>
+              </div>
+
+              {item.tags?.map((tag, i) => (
+                <span
+                  key={i}
+                  className="rounded-full bg-orange-50/60 backdrop-blur-sm border border-orange-200/40 px-3 py-1.5 lg:px-4 lg:py-2 text-[9px] lg:text-xs font-bold uppercase tracking-wider text-orange-600 shadow-sm"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {item.description && (
+              <p
+                className="mt-6 lg:mt-8 leading-relaxed text-gray-800 font-medium opacity-90"
+                style={{ fontSize: "clamp(0.85rem, 1.25vw + 0.4rem, 1.125rem)" }}
+              >
+                {item.description}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Right sidebar -- chapter TOC + metadata */}
-      {chapters.length > 0 && (
-        <aside className="hidden xl:block w-56 shrink-0">
-          <div className="sticky top-16 space-y-6">
-            {/* Metadata card */}
-            <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Book className="h-4 w-4 text-gray-400" />
-                <span>{chapters.length} chapter{chapters.length !== 1 ? "s" : ""}</span>
-              </div>
-              {item.level && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <BarChart3 className="h-4 w-4 text-gray-400" />
-                  <span className="capitalize">{item.level}</span>
-                </div>
-              )}
-              {item.tags?.length > 0 && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Tag className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
-                  <div className="flex flex-wrap gap-1">
-                    {item.tags.map((tag, i) => (
-                      <span key={i} className="inline-block rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-600">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+      <div className="flex gap-8">
+        {/* Main content */}
+        <div className="min-w-0 flex-1 max-w-6xl">
+          {/* Mobile TOC dropdown */}
+          <MobileTOC chapters={chapters} />
 
-            {/* Chapter links */}
-            <div className="rounded-xl border border-gray-200 bg-white p-4">
-              <ChapterTOC chapters={chapters} />
+          <ItemDetails item={item} />
+        </div>
+
+        {/* Right sidebar -- chapter TOC + metadata */}
+        {chapters.length > 0 && (
+          <aside className="hidden xl:block w-56 shrink-0">
+            <div className="sticky top-16 space-y-6">
+
+
+              {/* Chapter links */}
+              <div className="rounded-xl border border-gray-200 bg-white p-4">
+                <ChapterTOC chapters={chapters} />
+              </div>
             </div>
-          </div>
-        </aside>
-      )}
+          </aside>
+        )}
       </div>
     </div>
   );

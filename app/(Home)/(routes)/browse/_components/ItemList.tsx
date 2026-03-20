@@ -70,7 +70,7 @@ export default function ItemList({ items, viewMode = "list" }: ItemListProps) {
               </div>
             ) : (
               <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-3 transition-all hover:shadow-sm hover:border-gray-300">
-                <div className="w-28 h-[4.5rem] shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                <div className="w-28 h-[4.5rem] shrink-0 rounded-sm overflow-hidden bg-gray-100">
                   {item.banner?.url ? (
                     <Image
                       src={item.banner.url}

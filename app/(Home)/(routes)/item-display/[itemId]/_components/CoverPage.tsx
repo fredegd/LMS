@@ -8,17 +8,17 @@ interface CoverPageProps {
 
 export default function CoverPage({ data }: CoverPageProps) {
   return (
-    <div className="mb-6">
+    <div className="group">
       {data?.banner?.url ? (
-        <div className="overflow-hidden rounded-xl shadow-sm border border-gray-100">
+        <div className="relative aspect-video w-full overflow-hidden shadow-lg border border-gray-100/50">
           <Image
             src={data.banner.url}
             alt={data.title}
-            width={1400}
-            height={788}
-            className="w-full h-auto"
+            fill
+            className="object-cover"
             priority
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
         </div>
       ) : (
         <div className="flex items-center justify-center h-48 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 text-sm text-gray-400">
