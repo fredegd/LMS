@@ -1,22 +1,29 @@
+console.log("DEBUG: Loading /app/_services/mutations.ts");
 import { GraphQLClient, gql } from "graphql-request";
 
-const contentApiUrl = process.env.HYGRAPH_CONTENT_API_URL;
-const apiToken = process.env.HYGRAPH_API_TOKEN;
-
-const mutationClient =
-  contentApiUrl && apiToken
-    ? new GraphQLClient(contentApiUrl, {
-        headers: { Authorization: `Bearer ${apiToken}` },
-      })
-    : null;
+let mutationClient: GraphQLClient | null = null;
 
 const getMutationClient = (): GraphQLClient => {
   if (!mutationClient) {
-    throw new Error(
-      "Hygraph mutation client not configured. Set HYGRAPH_CONTENT_API_URL and HYGRAPH_API_TOKEN.",
-    );
+    const contentApiUrl = process.env.HYGRAPH_CONTENT_API_URL;
+    const apiToken = process.env.HYGRAPH_API_TOKEN;
+
+    if (!contentApiUrl || !apiToken) {
+      throw new Error(
+        "Hygraph mutation client not configured. Set HYGRAPH_CONTENT_API_URL and HYGRAPH_API_TOKEN.",
+      );
+    }
+    mutationClient = new GraphQLClient(contentApiUrl, {
+      headers: { Authorization: `Bearer ${apiToken}` },
+    });
   }
   return mutationClient;
+};
+
+const getEnv = () => {
+  const contentApiUrl = process.env.HYGRAPH_CONTENT_API_URL;
+  const apiToken = process.env.HYGRAPH_API_TOKEN;
+  return { contentApiUrl, apiToken };
 };
 
 // ---------------------------------------------------------------------------
@@ -285,6 +292,7 @@ const UPDATE_CHAPTER_BANNER_VIA_PARENT = gql`
 `;
 
 export async function uploadAsset(file: File): Promise<{ id: string, url: string }> {
+  const { apiToken, contentApiUrl } = getEnv();
   if (!apiToken || !contentApiUrl) {
     throw new Error("Hygraph upload not configured. Set HYGRAPH_API_TOKEN and HYGRAPH_CONTENT_API_URL.");
   }

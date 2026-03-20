@@ -5,6 +5,7 @@ import BannerUpload from "./BannerUpload";
 import { SnippetCollection } from "../../../../../types/hygraph";
 
 const LEVEL_OPTIONS = ["beginner", "intermediate", "advanced"];
+const TAG_OPTIONS = ["Angular", "animation", "bootstrap", "CSS", "express", "firebase", "Go", "HTML", "java", "javascript", "NextJS", "node", "P5JS", "pattern", "PHP", "phyton", "processing", "react", "ruby", "tailwind", "ThreeJS", "UI", "UX", "vector", "browser", "chrome"];
 
 interface ItemFormProps {
   initialData?: SnippetCollection | null;
@@ -18,34 +19,45 @@ export default function ItemForm({ initialData, onSave, onCancel, isSaving }: It
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [tagsInput, setTagsInput] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const [level, setLevel] = useState("");
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
       setDescription(initialData.description || "");
-      setTagsInput((initialData.tags || []).join(", "));
+      setSelectedTags(initialData.tags || []);
       setLevel(initialData.level || "");
     } else {
       setTitle("");
       setDescription("");
-      setTagsInput("");
+      setSelectedTags([]);
       setLevel("");
     }
   }, [initialData]);
 
+  const handleAddTag = (tag: string) => {
+    const trimmed = tag.trim();
+    if (trimmed && !selectedTags.includes(trimmed)) {
+      setSelectedTags([...selectedTags, trimmed]);
+    }
+    setNewTag("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      handleAddTag(newTag);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const tags = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     onSave({
       title,
       description,
-      tags,
+      tags: selectedTags,
       level: level || undefined,
     });
   };
@@ -94,15 +106,54 @@ export default function ItemForm({ initialData, onSave, onCancel, isSaving }: It
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Tags <span className="text-gray-400 text-xs">(comma-separated)</span>
+          Tags <span className="text-orange-400 text-xs">(Enter or comma to add)</span>
         </label>
-        <input
-          type="text"
-          value={tagsInput}
-          onChange={(e) => setTagsInput(e.target.value)}
-          className="w-full rounded-md border px-3 py-2 text-sm focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
-          placeholder="react, hooks, javascript"
-        />
+        <div className="flex flex-wrap gap-2 mb-2 p-2 min-h-[42px] border rounded-md focus-within:ring-1 focus-within:ring-orange-400 focus-within:border-orange-400 transition-all">
+          {selectedTags.map((tag) => (
+            <span 
+              key={tag} 
+              className="flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs font-medium border border-orange-200"
+            >
+              {tag}
+              <button 
+                type="button" 
+                onClick={() => setSelectedTags(selectedTags.filter(t => t !== tag))}
+                className="hover:text-orange-900 transition-colors"
+                aria-label={`Remove ${tag}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={() => handleAddTag(newTag)}
+            className="flex-1 min-w-[120px] bg-transparent border-none p-0 text-sm focus:ring-0 outline-none"
+            placeholder="Add custom tag..."
+          />
+        </div>
+        
+        <label className="block text-[10px] font-medium text-gray-500 mb-1 uppercase tracking-wider">
+          Suggestions
+        </label>
+        <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto p-1 bg-gray-50 rounded border border-dashed">
+          {TAG_OPTIONS.sort()
+            .filter(tag => !selectedTags.includes(tag))
+            .map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleAddTag(tag)}
+                className="px-2 py-0.5 rounded-full text-[11px] bg-white text-gray-500 border border-gray-200 hover:border-orange-300 hover:text-orange-600 transition-colors"
+              >
+                + {tag}
+              </button>
+            ))
+          }
+        </div>
       </div>
 
       <div>
