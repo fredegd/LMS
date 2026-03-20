@@ -2,13 +2,22 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SignInPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
   const authError = searchParams?.get("error");
+  const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/browse");
+    }
+  }, [status, router]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +30,10 @@ export default function SignInPage() {
     if (authError) return "Authentication failed. Please try again.";
     return "";
   }, [authError, formError]);
+
+  if (status === "loading" || status === "authenticated") {
+    return null;
+  }
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

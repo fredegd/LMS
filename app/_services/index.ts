@@ -16,10 +16,16 @@ const ITEM_PREVIEW_QUERY = gql`
     snippetCollections(orderBy: updatedAt_DESC) {
       id
       title
+      level
       tags
       description
       banner {
         url
+      }
+      chapterSection {
+        ... on Chapter {
+          id
+        }
       }
     }
   }
@@ -64,7 +70,11 @@ const mapSnippetPreview = (snippet: any): SnippetPreview => ({
   title: snippet.title || "Untitled item",
   description: snippet.description || "",
   tags: Array.isArray(snippet.tags) ? snippet.tags : [],
+  level: snippet.level || "unspecified",
   banner: snippet.banner?.url ? { url: snippet.banner.url } : null,
+  chapterSection: Array.isArray(snippet.chapterSection)
+    ? snippet.chapterSection.map((c: any) => ({ id: c.id }))
+    : [],
 });
 
 const mapSnippetDetails = (snippet: any): SnippetCollection => ({

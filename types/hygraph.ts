@@ -26,5 +26,7 @@ export interface SnippetPreview {
   title: string;
   description: string;
   tags: string[];
+  level: string;
   banner: Asset | null;
+  chapterSection?: { id: string }[];
 }

@@ -9,7 +9,7 @@ interface ItemListProps {
   viewMode?: "grid" | "list";
 }
 
-export default function ItemList({ items, viewMode = "grid" }: ItemListProps) {
+export default function ItemList({ items, viewMode = "list" }: ItemListProps) {
   const isGrid = viewMode === "grid";
 
   return (

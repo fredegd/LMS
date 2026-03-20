@@ -58,10 +58,10 @@ export default function ContentTable({ items, onEdit, onDelete }: ContentTablePr
                 </div>
               </td>
               <td className="px-4 py-3 capitalize hidden md:table-cell text-gray-500">
-                {(item as any).level || "—"}
+                {item.level || "—"}
               </td>
               <td className="px-4 py-3 hidden lg:table-cell text-gray-500">
-                {(item as any).chapterSection?.length ?? 0}
+                {item.chapterSection?.length ?? 0}
               </td>
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">

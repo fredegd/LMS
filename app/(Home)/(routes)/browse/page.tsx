@@ -7,7 +7,20 @@ import { getList } from "../../../_services/index";
 import ItemList from "./_components/ItemList";
 import { SnippetPreview } from "../../../../types/hygraph";
 
-function CardSkeleton() {
+function CardSkeleton({ viewMode = "grid" }: { viewMode?: "grid" | "list" }) {
+  if (viewMode === "list") {
+    return (
+      <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-3">
+        <div className="skeleton w-28 h-[4.5rem] shrink-0 rounded-lg" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="skeleton h-4 w-3/4 rounded" />
+          <div className="skeleton h-3 w-full rounded" />
+          <div className="skeleton h-3 w-1/4 rounded mt-2" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
       <div className="skeleton aspect-[16/9] w-full" />
@@ -20,11 +33,17 @@ function CardSkeleton() {
   );
 }
 
-function BrowseSkeleton() {
+function BrowseSkeleton({ viewMode = "grid" }: { viewMode?: "grid" | "list" }) {
   return (
-    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      className={
+        viewMode === "grid"
+          ? "mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          : "mt-5 flex flex-col gap-3"
+      }
+    >
       {Array.from({ length: 6 }).map((_, i) => (
-        <CardSkeleton key={i} />
+        <CardSkeleton key={i} viewMode={viewMode} />
       ))}
     </div>
   );
@@ -36,7 +55,21 @@ function Browse() {
   const [itemsOriginal, setItemsOriginal] = useState<SnippetPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedMode = localStorage.getItem("browseViewMode") as "grid" | "list";
+    if (savedMode && (savedMode === "grid" || savedMode === "list")) {
+      setViewMode(savedMode);
+    }
+  }, []);
+
+  const updateViewMode = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("browseViewMode", mode);
+  };
 
   useEffect(() => {
     let active = true;
@@ -100,7 +133,7 @@ function Browse() {
         />
         <div className="flex gap-0.5 shrink-0 rounded-lg border border-gray-200 bg-white p-0.5">
           <button
-            onClick={() => setViewMode("grid")}
+            onClick={() => updateViewMode("grid")}
             title="Grid view"
             className={`p-1.5 rounded-md transition-colors ${
               viewMode === "grid"
@@ -111,7 +144,7 @@ function Browse() {
             <LayoutGrid size={16} />
           </button>
           <button
-            onClick={() => setViewMode("list")}
+            onClick={() => updateViewMode("list")}
             title="List view"
             className={`p-1.5 rounded-md transition-colors ${
               viewMode === "list"
@@ -125,12 +158,14 @@ function Browse() {
       </div>
 
       {/* Content area */}
-      {error ? (
+      {!isMounted ? (
+        <BrowseSkeleton viewMode={viewMode} />
+      ) : error ? (
         <div className="flex flex-col items-center justify-center h-60 text-gray-500">
           <p>{error}</p>
         </div>
       ) : isLoading ? (
-        <BrowseSkeleton />
+        <BrowseSkeleton viewMode={viewMode} />
       ) : items.length ? (
         <ItemList items={items} viewMode={viewMode} />
       ) : (

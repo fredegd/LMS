@@ -44,7 +44,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           ) : (
             <button
               className="flex items-center gap-2 rounded-lg border border-gray-200 px-3.5 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={() => signOut({ callbackUrl: "/sign-in" })}
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden xs:inline">Logout</span>
