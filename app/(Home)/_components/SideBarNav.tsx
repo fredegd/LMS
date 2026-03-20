@@ -55,7 +55,7 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
             />
           )}
         </Link>
-        
+
         {closeMobile && (
           <button
             onClick={closeMobile}
@@ -68,10 +68,10 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
 
       {/* Toggle button area */}
       {onToggleCollapse && (
-        <div className={`hidden sm:flex px-2 py-1 ${isCollapsed ? "justify-center" : "justify-end"} border-b border-white/5 bg-white/5`}>
+        <div className={`hidden sm:flex px-2 ${isCollapsed ? "justify-center" : "justify-end"} h-0  relative`}>
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-full text-gray-400 hover:text-white bg-gray-950 hover:bg-white/10 transition-colors z-50 absolute top-1/2 -right-3 translate-y-[-50%]"
             title={isCollapsed ? "Expand" : "Collapse"}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -101,7 +101,7 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
               `}
             >
               <item.icon className="h-5 w-5 shrink-0" />
-              {!isCollapsed && <span className="hidden md:inline">{item.name}</span>}
+              {!isCollapsed && <span>{item.name}</span>}
             </Link>
           );
         })}

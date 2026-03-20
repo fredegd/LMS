@@ -73,10 +73,10 @@ export default function Chapter({ content }: ChapterProps) {
         )}
 
         {content.chapterSnippet && (
-          <div className="relative group p-4 bg-gray-50/80 rounded-xl border border-gray-100">
+          <div className="relative group px-2 md:px-4 ">
             <button
               onClick={onCopy}
-              className="absolute right-3 top-3 p-2 rounded-lg bg-white border border-gray-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
+              className="absolute right-4 top-4 p-2 rounded-lg bg-white border border-gray-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
               title="Copy Snippet"
             >
               {copied ? (
@@ -85,7 +85,7 @@ export default function Chapter({ content }: ChapterProps) {
                 <Copy className="h-4 w-4 text-gray-500" />
               )}
             </button>
-            <div className="prose max-w-none">
+            <div className="prose max-w-none m-0">
               <Markdown>{content.chapterSnippet}</Markdown>
             </div>
           </div>

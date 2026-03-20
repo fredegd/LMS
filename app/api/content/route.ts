@@ -4,9 +4,10 @@ export const dynamic = "force-dynamic";
 import { getList } from "@/app/_services/index";
 import { createSnippetCollection } from "@/app/_services/mutations";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const data = await getList();
+    const search = request.nextUrl.searchParams.get("search") || "";
+    const data = await getList(search);
     return NextResponse.json(data);
   } catch (error) {
     console.error("GET /api/content failed:", error);

@@ -1,12 +1,13 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus, ArrowLeft } from "lucide-react";
 import ContentTable from "./_components/ContentTable";
 import ItemForm from "./_components/ItemForm";
 import ChapterManager from "./_components/ChapterManager";
 import { SnippetCollection, SnippetPreview } from "../../../../types/hygraph";
 
-export default function Dashboard() {
+function DashboardInner() {
   const [view, setView] = useState<"list" | "create" | "edit">("list");
   const [items, setItems] = useState<SnippetPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,11 +16,17 @@ export default function Dashboard() {
   const [editItem, setEditItem] = useState<SnippetCollection | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SnippetPreview | null>(null);
 
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get("search") || "";
+
   const loadItems = useCallback(async () => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/content");
+      const url = searchQuery 
+        ? `/api/content?search=${encodeURIComponent(searchQuery)}` 
+        : "/api/content";
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to load items");
       const data = await res.json();
       setItems(data.snippetCollections || []);
@@ -28,7 +35,7 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [searchQuery]);
 
   const loadItemDetails = useCallback(async (id: string) => {
     try {
@@ -260,5 +267,17 @@ export default function Dashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-60">
+        <p className="text-gray-400">Loading Dashboard…</p>
+      </div>
+    }>
+      <DashboardInner />
+    </Suspense>
   );
 }

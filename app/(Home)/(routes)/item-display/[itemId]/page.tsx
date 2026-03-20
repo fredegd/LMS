@@ -246,7 +246,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
 
       <div className="flex gap-8">
         {/* Main content */}
-        <div className="min-w-0 flex-1 max-w-6xl">
+        <div className="min-w-0 flex-1 max-w-7xl">
           {/* Mobile TOC dropdown */}
           <MobileTOC chapters={chapters} />
 

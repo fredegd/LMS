@@ -12,8 +12,11 @@ const client =
   });
 
 const ITEM_PREVIEW_QUERY = gql`
-  query ItemPreview {
-    snippetCollections(orderBy: updatedAt_DESC) {
+  query ItemPreview($where: SnippetCollectionWhereInput) {
+    snippetCollections(
+      orderBy: updatedAt_DESC
+      where: $where
+    ) {
       id
       title
       level
@@ -98,12 +101,28 @@ const getClient = (): GraphQLClient | null => {
   return client;
 };
 
-export const getList = async (): Promise<{ snippetCollections: SnippetPreview[] }> => {
+export const getList = async (search: string = ""): Promise<{ snippetCollections: SnippetPreview[] }> => {
   const currentClient = getClient();
   if (!currentClient) return { snippetCollections: [] };
 
+  const sanitizedSearch = search.trim();
+  
+  // Construct dynamic where filter
+  const where = sanitizedSearch 
+    ? {
+        OR: [
+          { title_contains: sanitizedSearch },
+          { description_contains: sanitizedSearch },
+          { chapterSection_some: { Chapter: { title_contains: sanitizedSearch } } }
+        ]
+      }
+    : {};
+
   try {
-    const result = await currentClient.request<{ snippetCollections: any[] }>(ITEM_PREVIEW_QUERY);
+    const result = await currentClient.request<{ snippetCollections: any[] }>(
+      ITEM_PREVIEW_QUERY, 
+      { where }
+    );
     return {
       snippetCollections: (result?.snippetCollections || []).map(
         mapSnippetPreview,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { LayoutGrid, List, ArrowUpDown } from "lucide-react";
 import CategoryFilter from "./_components/CategoryFilter";
 import { getList } from "../../../_services/index";
@@ -58,6 +59,8 @@ function Browse() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [sortBy, setSortBy] = useState<string>("newest");
   const [isMounted, setIsMounted] = useState(false);
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get("search") || "";
 
   useEffect(() => {
     setIsMounted(true);
@@ -79,7 +82,7 @@ function Browse() {
       setIsLoading(true);
       setError("");
 
-      const response = await getList();
+      const response = await getList(searchQuery);
       const snippetCollections = response?.snippetCollections || [];
 
       if (!active) return;
@@ -109,7 +112,7 @@ function Browse() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [searchQuery]);
 
   const filterItems = (category: string) => {
     if (category === "all tags") {
