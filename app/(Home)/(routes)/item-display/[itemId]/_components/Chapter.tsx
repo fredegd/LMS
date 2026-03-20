@@ -15,12 +15,29 @@ export default function Chapter({ content }: ChapterProps) {
 
   const onCopy = () => {
     if (content.chapterSnippet) {
-      // Remove triple backticks and optional language identifier from start and end
-      const cleanSnippet = content.chapterSnippet
-        .replace(/^```[^\n]*\n?/, "")
-        .replace(/\n?```\s*$/, "");
-      
-      navigator.clipboard.writeText(cleanSnippet);
+      // More robust way to extract content between the first and last triple-backticks
+      const raw = content.chapterSnippet.trim();
+      const firstBacktick = raw.indexOf("```");
+      const lastBacktick = raw.lastIndexOf("```");
+
+      let cleanSnippet = raw;
+
+      if (firstBacktick !== -1 && lastBacktick !== -1 && firstBacktick !== lastBacktick) {
+        // Find the end of the first line (where the ```language occurs)
+        const firstLineEnd = raw.indexOf("\n", firstBacktick);
+        
+        if (firstLineEnd !== -1 && firstLineEnd < lastBacktick) {
+          // Extract everything from after the first line until the last backticks
+          cleanSnippet = raw.slice(firstLineEnd + 1, lastBacktick);
+        } else {
+          // Fallback: just remove the backticks themselves if it's all on one line
+          cleanSnippet = raw.slice(firstBacktick + 3, lastBacktick);
+          // If the remaining part starts with a language identifier (e.g. "javascript code"), trim it
+          cleanSnippet = cleanSnippet.replace(/^[a-zA-Z+%-]+\s+/, "");
+        }
+      }
+
+      navigator.clipboard.writeText(cleanSnippet.trim());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
