@@ -8,9 +8,10 @@ import SearchBar from "./SearchBar";
 
 interface HeaderProps {
   onMenuClick: () => void;
+  isCollapsed?: boolean;
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ onMenuClick, isCollapsed }: HeaderProps) {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -18,7 +19,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const isSignedIn = Boolean(session?.user);
 
   return (
-    <header className="sticky top-0 z-40 ml-0 sm:ml-[var(--sidebar-w)] h-[var(--header-h)] border-b border-gray-200/60 bg-white/80 backdrop-blur-md">
+    <header 
+      className="sticky top-0 z-40 ml-0 sm:ml-[var(--sidebar-w)] h-[var(--header-h)] border-b border-gray-200/60 bg-white/80 backdrop-blur-md transition-[margin-left] duration-300 ease-in-out"
+    >
       <div className="flex h-full items-center justify-between gap-4 px-4 md:px-6">
         {/* Mobile hamburger */}
         <button

@@ -173,7 +173,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
   return (
     <div className="relative">
       {/* Back Button - Fixed but offset from sidebar */}
-      <div className="fixed top-16 left-[calc(var(--sidebar-w)+1.5rem)] z-50">
+      <div className="fixed top-16 left-[calc(var(--sidebar-w)+1.5rem)] z-50 transition-[left] duration-300 ease-in-out">
         <button
           onClick={() => router.back()}
           className="group flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all duration-300"
