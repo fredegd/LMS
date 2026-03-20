@@ -1,6 +1,8 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+export const dynamic = "force-dynamic";
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -19,12 +21,21 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const authEmail =
           process.env.LOCAL_USER_EMAIL ||
+          process.env.CORE_USER_EMAIL ||
           process.env.AUTH_EMAIL;
         const authPassword =
           process.env.LOCAL_USER_PASSWORD ||
+          process.env.CORE_USER_PASSWORD ||
           process.env.AUTH_PASSWORD;
 
+        console.log("Authorize attempt email:", credentials?.email);
+        console.log("Expected email from env:", authEmail);
+        console.log("Is password present in env?:", !!authPassword);
+        console.log("Password length (received):", credentials?.password?.length);
+        console.log("Password length (expected):", authPassword?.length);
+
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials in request.");
           return null;
         }
 
@@ -40,6 +51,7 @@ export const authOptions: NextAuthOptions = {
             authEmail.trim().toLowerCase() &&
           credentials.password === authPassword
         ) {
+          console.log("Authorization successful.");
           return {
             id: authEmail,
             email: authEmail,
@@ -47,10 +59,13 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
+        console.log("Authorization failed (credentials mismatch).");
         return null;
       },
     }),
   ],
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
