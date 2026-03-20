@@ -90,9 +90,11 @@ const CREATE_CHAPTER_VIA_PARENT = gql`
         chapterSection: {
           create: {
             Chapter: {
-              title: $title
-              chapterDescription: $chapterDescription
-              chapterSnippet: $chapterSnippet
+              data: {
+                title: $title
+                chapterDescription: $chapterDescription
+                chapterSnippet: $chapterSnippet
+              }
             }
           }
         }
@@ -218,6 +220,197 @@ export async function updateChapter(parentId, chapterId, { title, chapterDescrip
 export async function deleteChapter(parentId, chapterId) {
   const client = getMutationClient();
   await client.request(DELETE_CHAPTER_VIA_PARENT, { parentId, chapterId });
+  await client.request(PUBLISH_SNIPPET, { where: { id: parentId } });
+  return { parentId, chapterId };
+}
+
+// ---------------------------------------------------------------------------
+// Asset upload & banner mutations
+// ---------------------------------------------------------------------------
+
+
+const PUBLISH_ASSET = gql`
+  mutation PublishAsset($where: AssetWhereUniqueInput!) {
+    publishAsset(where: $where, to: [PUBLISHED]) {
+      id
+      url
+    }
+  }
+`;
+
+const UPDATE_COLLECTION_BANNER = gql`
+  mutation UpdateCollectionBanner(
+    $where: SnippetCollectionWhereUniqueInput!
+    $data: SnippetCollectionUpdateInput!
+  ) {
+    updateSnippetCollection(where: $where, data: $data) {
+      id
+    }
+  }
+`;
+
+const UPDATE_CHAPTER_BANNER_VIA_PARENT = gql`
+  mutation UpdateChapterBanner(
+    $parentId: ID!
+    $chapterId: ID!
+    $assetId: ID!
+  ) {
+    updateSnippetCollection(
+      where: { id: $parentId }
+      data: {
+        chapterSection: {
+          update: {
+            Chapter: {
+              where: { id: $chapterId }
+              data: { banner: { connect: { id: $assetId } } }
+            }
+          }
+        }
+      }
+    ) {
+      id
+    }
+  }
+`;
+
+/**
+ * Upload a file to Hygraph using the New Asset Management System (2-Step S3 Upload).
+ * Higher reliability than multipart/form-data for modern environments and large files.
+ * @param {Blob|File} file
+ * @returns {{ id: string, url: string }}
+ */
+export async function uploadAsset(file) {
+  if (!apiToken || !contentApiUrl) {
+    throw new Error("Hygraph upload not configured. Set HYGRAPH_API_TOKEN and HYGRAPH_CONTENT_API_URL.");
+  }
+
+  const client = getMutationClient();
+
+  // Step 1: Create Asset and get S3 upload details
+  const CREATE_ASSET_MUTATION = gql`
+    mutation CreateAsset($fileName: String!) {
+      createAsset(data: { fileName: $fileName }) {
+        id
+        url
+        upload {
+          requestPostData {
+            url
+            key
+            signature
+            algorithm
+            policy
+            date
+            credential
+            securityToken
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const createResult = await client.request(CREATE_ASSET_MUTATION, {
+      fileName: file.name || "upload",
+    });
+
+    if (!createResult?.createAsset?.upload?.requestPostData) {
+      throw new Error("Hygraph upload initiation failed: No S3 metadata returned.");
+    }
+
+    const { id: assetId, upload, url: initialUrl } = createResult.createAsset;
+    const { url: s3Url, ...metadata } = upload.requestPostData;
+
+    // Step 2: Upload to S3 (Multipart/form-data)
+    const formData = new FormData();
+    formData.append("key", metadata.key);
+    formData.append("X-Amz-Algorithm", metadata.algorithm);
+    formData.append("X-Amz-Credential", metadata.credential);
+    formData.append("X-Amz-Date", metadata.date);
+    formData.append("Policy", metadata.policy);
+    formData.append("X-Amz-Signature", metadata.signature);
+    if (metadata.securityToken) {
+      formData.append("X-Amz-Security-Token", metadata.securityToken);
+    }
+    formData.append("file", file);
+
+    const s3Response = await fetch(s3Url, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!s3Response.ok) {
+      const errorText = await s3Response.text();
+      throw new Error(`S3 upload failed (${s3Response.status}): ${errorText}`);
+    }
+
+    // Step 3: Poll for completion (Asset remains PENDING until processed)
+    const STATUS_QUERY = gql`
+      query GetAssetStatus($id: ID!) {
+        asset(where: { id: $id }, stage: DRAFT) {
+          id
+          url
+          upload {
+            status
+          }
+        }
+      }
+    `;
+
+    let attempts = 0;
+    const maxAttempts = 10;
+    while (attempts < maxAttempts) {
+      const statusResult = await client.request(STATUS_QUERY, { id: assetId });
+      const status = statusResult?.asset?.upload?.status;
+      const currentUrl = statusResult?.asset?.url || initialUrl;
+
+      console.log(`Hygraph Status Poll #${attempts + 1}: ${status || "null"}`);
+
+      if (status === "ASSET_CREATE_COMPLETE") {
+        return { id: assetId, url: currentUrl };
+      }
+
+      if (status === "ASSET_CREATE_FAILED") {
+        throw new Error("Asset processing failed on Hygraph servers.");
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      attempts++;
+    }
+
+    // If still pending after 10s, return anyway so linking can proceed
+    console.log(`Asset ${assetId} still pending but returning for linking.`);
+    return { id: assetId, url: initialUrl };
+  } catch (error) {
+    if (error.response?.errors) {
+      throw new Error(`Hygraph upload failed: ${error.response.errors[0].message}`);
+    }
+    throw new Error(`Hygraph upload failed: ${error.message}`);
+  }
+}
+
+export async function publishAsset(assetId) {
+  const client = getMutationClient();
+  const result = await client.request(PUBLISH_ASSET, { where: { id: assetId } });
+  return result.publishAsset;
+}
+
+export async function updateSnippetCollectionBanner(collectionId, assetId) {
+  const client = getMutationClient();
+  await client.request(UPDATE_COLLECTION_BANNER, {
+    where: { id: collectionId },
+    data: { banner: { connect: { id: assetId } } },
+  });
+  await client.request(PUBLISH_SNIPPET, { where: { id: collectionId } });
+  return { id: collectionId };
+}
+
+export async function updateChapterBanner(parentId, chapterId, assetId) {
+  const client = getMutationClient();
+  await client.request(UPDATE_CHAPTER_BANNER_VIA_PARENT, {
+    parentId,
+    chapterId,
+    assetId,
+  });
   await client.request(PUBLISH_SNIPPET, { where: { id: parentId } });
   return { parentId, chapterId };
 }

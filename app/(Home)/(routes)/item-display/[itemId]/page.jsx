@@ -139,7 +139,7 @@ export default function ItemPreview({ params }) {
   return (
     <div className="flex gap-8">
       {/* Main content */}
-      <div className="min-w-0 flex-1 max-w-4xl">
+      <div className="min-w-0 flex-1 max-w-6xl">
         <CoverPage data={item} />
 
         {/* Mobile TOC dropdown */}

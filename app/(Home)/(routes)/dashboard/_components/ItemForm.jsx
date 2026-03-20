@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Save, X } from "lucide-react";
+import BannerUpload from "./BannerUpload";
 
 const LEVEL_OPTIONS = ["beginner", "intermediate", "advanced"];
 
@@ -113,6 +114,18 @@ export default function ItemForm({ initialData, onSave, onCancel, isSaving }) {
           ))}
         </select>
       </div>
+
+      {/* Banner upload — edit mode only */}
+      {isEdit && (
+        <BannerUpload
+          currentUrl={initialData?.banner?.url || null}
+          linkEndpoint={`/api/content/${initialData.id}/banner`}
+          onUploaded={(assetId, url) => {
+            // Update is handled by the BannerUpload component via the link endpoint
+          }}
+          disabled={isSaving}
+        />
+      )}
 
       <div className="flex justify-end gap-3 pt-2">
         <button
