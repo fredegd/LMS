@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { LayoutGrid, List, ArrowUpDown } from "lucide-react";
 import CategoryFilter from "./_components/CategoryFilter";
@@ -238,4 +238,11 @@ function Browse() {
   );
 }
 
-export default Browse;
+export default function BrowsePage() {
+  return (
+    <Suspense fallback={<BrowseSkeleton viewMode="list" />}>
+      <Browse />
+    </Suspense>
+  );
+}
+
