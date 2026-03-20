@@ -1,7 +1,7 @@
 import { GraphQLClient, gql } from "graphql-request";
 import { SnippetCollection, SnippetPreview, Chapter } from "../../types/hygraph";
 
-const endpoint = process.env.NEXT_PUBLIC_HYGRAPH_API_URL_HIGH_PERFORMANCE;
+const endpoint = (typeof window === "undefined" ? process.env.HYGRAPH_CONTENT_API_URL : null) || process.env.NEXT_PUBLIC_HYGRAPH_API_URL_HIGH_PERFORMANCE;
 
 const client =
   endpoint &&
@@ -19,6 +19,7 @@ const ITEM_PREVIEW_QUERY = gql`
       level
       tags
       description
+      createdAt
       banner {
         url
       }
@@ -75,6 +76,7 @@ const mapSnippetPreview = (snippet: any): SnippetPreview => ({
   chapterSection: Array.isArray(snippet.chapterSection)
     ? snippet.chapterSection.map((c: any) => ({ id: c.id }))
     : [],
+  createdAt: snippet.createdAt || "",
 });
 
 const mapSnippetDetails = (snippet: any): SnippetCollection => ({

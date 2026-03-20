@@ -29,4 +29,5 @@ export interface SnippetPreview {
   level: string;
   banner: Asset | null;
   chapterSection?: { id: string }[];
+  createdAt: string;
 }

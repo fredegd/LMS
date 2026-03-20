@@ -1,5 +1,6 @@
 console.log("DEBUG: Loading /api/content/route.ts");
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { getList } from "@/app/_services/index";
 import { createSnippetCollection } from "@/app/_services/mutations";
 

@@ -4,7 +4,6 @@ import { Plus, ArrowLeft } from "lucide-react";
 import ContentTable from "./_components/ContentTable";
 import ItemForm from "./_components/ItemForm";
 import ChapterManager from "./_components/ChapterManager";
-import { getList, getItemById } from "../../../_services/index";
 import { SnippetCollection, SnippetPreview } from "../../../../types/hygraph";
 
 export default function Dashboard() {
@@ -20,7 +19,9 @@ export default function Dashboard() {
     setIsLoading(true);
     setError("");
     try {
-      const data = await getList();
+      const res = await fetch("/api/content");
+      if (!res.ok) throw new Error("Failed to load items");
+      const data = await res.json();
       setItems(data.snippetCollections || []);
     } catch (err: any) {
       setError(err.message);
@@ -31,7 +32,9 @@ export default function Dashboard() {
 
   const loadItemDetails = useCallback(async (id: string) => {
     try {
-      const data = await getItemById(id);
+      const res = await fetch(`/api/content/${id}`);
+      if (!res.ok) throw new Error("Failed to load item details");
+      const data = await res.json();
       return data.snippetCollection;
     } catch (err: any) {
       setError(err.message);

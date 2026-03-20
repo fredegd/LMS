@@ -1,13 +1,31 @@
+"use client";
+
 import Markdown from "react-markdown";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import { Chapter as ChapterType } from "../../../../../../types/hygraph";
+import { Copy, Check } from "lucide-react";
 
 interface ChapterProps {
   content: ChapterType;
 }
 
 export default function Chapter({ content }: ChapterProps) {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = () => {
+    if (content.chapterSnippet) {
+      // Remove triple backticks and optional language identifier from start and end
+      const cleanSnippet = content.chapterSnippet
+        .replace(/^```[^\n]*\n?/, "")
+        .replace(/\n?```\s*$/, "");
+      
+      navigator.clipboard.writeText(cleanSnippet);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <article
       id={`chapter-${content.id}`}
@@ -38,8 +56,21 @@ export default function Chapter({ content }: ChapterProps) {
         )}
 
         {content.chapterSnippet && (
-          <div className="prose max-w-none">
-            <Markdown>{content.chapterSnippet}</Markdown>
+          <div className="relative group p-4 bg-gray-50/80 rounded-xl border border-gray-100">
+            <button
+              onClick={onCopy}
+              className="absolute right-3 top-3 p-2 rounded-lg bg-white border border-gray-200 shadow-sm opacity-0 group-hover:opacity-100 transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
+              title="Copy Snippet"
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <Copy className="h-4 w-4 text-gray-500" />
+              )}
+            </button>
+            <div className="prose max-w-none">
+              <Markdown>{content.chapterSnippet}</Markdown>
+            </div>
           </div>
         )}
       </div>
