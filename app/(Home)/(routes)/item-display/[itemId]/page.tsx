@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import { Book, Tag, BarChart3, List, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowUp, Book, Tag, BarChart3, List, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { getItemById } from "../../../../_services/index";
 import CoverPage from "./_components/CoverPage";
 import ItemDetails from "./_components/ItemDetails";
@@ -83,10 +84,29 @@ interface ItemPreviewProps {
 }
 
 export default function ItemPreview({ params }: ItemPreviewProps) {
+  const router = useRouter();
   const { itemId } = use(params);
   const [item, setItem] = useState<SnippetCollection | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     let active = true;
@@ -151,7 +171,32 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
   const chapters = item.chapterSection || [];
 
   return (
-    <div className="flex gap-8">
+    <div className="relative">
+      {/* Back Button - Fixed but offset from sidebar */}
+      <div className="fixed top-6 left-[calc(var(--sidebar-w)+1.5rem)] z-50">
+        <button
+          onClick={() => router.back()}
+          className="group flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all duration-300"
+          title="Go Back"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+        </button>
+      </div>
+
+      {/* Scroll to Top Button - Fixed bottom right */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={scrollToTop}
+          className={`group flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg border border-gray-100 hover:shadow-xl hover:border-orange-200 transition-all duration-300 ${
+            showScrollTop ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-90 pointer-events-none"
+          }`}
+          title="Scroll to Top"
+        >
+          <ArrowUp className="h-6 w-6 text-gray-600 group-hover:text-orange-600 transition-colors" />
+        </button>
+      </div>
+
+      <div className="flex gap-8">
       {/* Main content */}
       <div className="min-w-0 flex-1 max-w-6xl">
         <CoverPage data={item} />
@@ -199,6 +244,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
           </div>
         </aside>
       )}
+      </div>
     </div>
   );
 }
