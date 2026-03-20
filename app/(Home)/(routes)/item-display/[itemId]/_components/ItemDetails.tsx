@@ -16,7 +16,7 @@ export default function ItemDetails({ item }: ItemDetailsProps) {
     <div>
       {/* Chapters */}
       {chapters.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-6">
           {chapters.map((chapter) => (
             <Chapter key={chapter.id} content={chapter} />
           ))}

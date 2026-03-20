@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Search, Layout, X, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -32,28 +31,25 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
   const user = session?.user;
 
   return (
-    <div className="h-full w-full bg-gray-950 flex flex-col overflow-y-auto relative">
+    <div className="h-full w-full bg-gray-950 flex flex-col relative"> {/* Removed overflow-y-auto to prevent clipping the toggle button */}
       {/* Logo area */}
       <div className={`flex items-center ${isCollapsed ? "justify-center" : "justify-between"} px-3 py-4 border-b border-white/10 h-16`}>
-        <Link href="/" onClick={closeMobile} className="flex items-center gap-2 min-w-0">
-          <Image
-            src="/logo.svg"
-            alt="logo"
-            width={32}
-            height={32}
-            className={`shrink-0 ${isCollapsed ? "block" : "md:hidden"}`}
-            loading="eager"
-          />
-          {!isCollapsed && (
-            <Image
-              src="/cs_logo.svg"
-              alt="logo"
-              width={130}
-              height={40}
-              className="hidden md:block brightness-0 invert"
-              loading="eager"
-            />
-          )}
+        <Link 
+          href="/" 
+          onClick={closeMobile} 
+          className="flex items-center min-w-0 font-mono text-xl font-bold text-white group"
+        >
+          <span className="text-orange-500 shrink-0 select-none">
+            {">"}
+          </span>
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap flex items-center ${
+              isCollapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100 ml-0.5"
+            }`}
+          >
+            <span>SNIPPETS</span>
+          </div>
+          <span className="text-orange-500 shrink-0 animate-pulse select-none">_</span>
         </Link>
 
         {closeMobile && (
@@ -68,19 +64,21 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
 
       {/* Toggle button area */}
       {onToggleCollapse && (
-        <div className={`hidden sm:flex px-2 ${isCollapsed ? "justify-center" : "justify-end"} h-0  relative`}>
+        <div className="absolute top-20 right-0 w-0 h-0 z-[70] hidden sm:block">
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded-full text-gray-400 hover:text-white bg-gray-950 hover:bg-white/10 transition-colors z-50 absolute top-1/2 -right-3 translate-y-[-50%]"
+            className="flex items-center justify-center h-6 w-6 rounded-full text-gray-400 hover:text-white bg-gray-900 border border-white/20 hover:border-orange-500/50 transition-all z-50 absolute -right-3 -translate-y-1/2 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:scale-110 active:scale-95 group/toggle"
             title={isCollapsed ? "Expand" : "Collapse"}
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            <div className="absolute inset-0 rounded-full bg-orange-500/0 group-hover/toggle:bg-orange-500/10 transition-colors" />
+            {isCollapsed ? <ChevronRight className="h-3.5 w-3.5 relative z-10" /> : <ChevronLeft className="h-3.5 w-3.5 relative z-10" />}
           </button>
         </div>
       )}
 
-      {/* Navigation links */}
-      <nav className="flex flex-col gap-1 p-2 mt-1">
+        {/* Navigation links - Scrollable section */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-2">
+          <nav className="flex flex-col gap-1 p-2">
         {menuList.map((item) => {
           if (item.protected && !user) return null;
 
@@ -105,7 +103,8 @@ export default function SideBarNav({ closeMobile, isCollapsed, onToggleCollapse 
             </Link>
           );
         })}
-      </nav>
+          </nav>
+        </div>
 
       <div className="mt-auto" />
     </div>

@@ -46,11 +46,11 @@ export default function Chapter({ content }: ChapterProps) {
   return (
     <article
       id={`chapter-${content.id}`}
-      className="scroll-mt-20 rounded-xl border border-gray-200 bg-white overflow-hidden"
+      className="scroll-mt-20 rounded-xl border border-gray-200 bg-white overflow-hidden min-h-[45rem]"
     >
       {/* Chapter header */}
       <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-3xl font-semibold text-gray-900">
           {content.title}
         </h2>
       </div>

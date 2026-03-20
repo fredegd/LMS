@@ -11,28 +11,38 @@ import { SnippetCollection, Chapter } from "../../../../../types/hygraph";
 interface ChapterTOCProps {
   chapters: Chapter[];
   className?: string;
+  activeId?: string | null;
 }
 
-function ChapterTOC({ chapters, className = "" }: ChapterTOCProps) {
+function ChapterTOC({ chapters, className = "", activeId }: ChapterTOCProps) {
   return (
     <nav className={className}>
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 ml-2.5">
         On this page
       </h3>
       <ul className="space-y-1">
-        {chapters.map((ch, i) => (
-          <li key={ch.id}>
-            <a
-              href={`#chapter-${ch.id}`}
-              className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-gray-600 hover:text-orange-600 hover:bg-orange-50/60 transition-colors"
-            >
-              <span className="shrink-0 w-5 text-center text-xs text-gray-400 font-mono">
-                {i + 1}
-              </span>
-              <span className="truncate">{ch.title}</span>
-            </a>
-          </li>
-        ))}
+        {chapters.map((ch, i) => {
+          const isActive = activeId === `chapter-${ch.id}`;
+          return (
+            <li key={ch.id} className="relative group">
+              <a
+                href={`#chapter-${ch.id}`}
+                className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-all duration-300 ${isActive
+                  ? "text-orange-600 bg-orange-50 font-medium"
+                  : "text-gray-600 hover:text-orange-600 hover:bg-orange-50/60"
+                  }`}
+              >
+                <span className={`shrink-0 w-5 text-center text-[10px] font-mono transition-colors ${isActive ? "text-orange-600" : "text-gray-400"}`}>
+                  {i + 1}
+                </span>
+                <span className="truncate">{ch.title}</span>
+              </a>
+              {isActive && (
+                <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-orange-600 rounded-full" />
+              )}
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -40,9 +50,10 @@ function ChapterTOC({ chapters, className = "" }: ChapterTOCProps) {
 
 interface MobileTOCProps {
   chapters: Chapter[];
+  activeId?: string | null;
 }
 
-function MobileTOC({ chapters }: MobileTOCProps) {
+function MobileTOC({ chapters, activeId }: MobileTOCProps) {
   const [open, setOpen] = useState(false);
 
   if (!chapters?.length) return null;
@@ -61,7 +72,7 @@ function MobileTOC({ chapters }: MobileTOCProps) {
       </button>
       {open && (
         <div className="mt-1 rounded-lg border border-gray-200 bg-white p-2">
-          <ChapterTOC chapters={chapters} />
+          <ChapterTOC chapters={chapters} activeId={activeId} />
         </div>
       )}
     </div>
@@ -90,6 +101,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,6 +115,35 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (isLoading || !item) return;
+    const chapters = item.chapterSection || [];
+    if (chapters.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Track sections that are crossing into the upper part of the viewport
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      {
+        // A smaller detection area near the top of the viewport yields more stable results
+        rootMargin: "-120px 0px -80% 0px",
+        threshold: 0
+      }
+    );
+
+    chapters.forEach((ch) => {
+      const el = document.getElementById(`chapter-${ch.id}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [isLoading, item]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -248,7 +289,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
         {/* Main content */}
         <div className="min-w-0 flex-1 max-w-7xl">
           {/* Mobile TOC dropdown */}
-          <MobileTOC chapters={chapters} />
+          <MobileTOC chapters={chapters} activeId={activeId} />
 
           <ItemDetails item={item} />
         </div>
@@ -261,7 +302,7 @@ export default function ItemPreview({ params }: ItemPreviewProps) {
 
               {/* Chapter links */}
               <div className="rounded-xl border border-gray-200 bg-white p-4">
-                <ChapterTOC chapters={chapters} />
+                <ChapterTOC chapters={chapters} activeId={activeId} />
               </div>
             </div>
           </aside>

@@ -66,7 +66,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
 
       {/* Desktop sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-50 hidden sm:flex sm:w-[var(--sidebar-w)] flex-col transition-[width] duration-300 ease-in-out"
+        className="fixed inset-y-0 left-0 z-[100] hidden sm:flex sm:w-[var(--sidebar-w)] flex-col transition-[width] duration-300 ease-in-out"
       >
         <SideBarNav
           isCollapsed={isCollapsed}
