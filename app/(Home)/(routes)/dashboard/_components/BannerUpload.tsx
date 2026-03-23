@@ -4,6 +4,62 @@ import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_DIMENSION = 1920; // px — longest side cap
+
+/**
+ * Resize an image File so its longest side is at most MAX_DIMENSION px.
+ * Returns a new Blob with the same MIME type (JPEG/PNG/WebP).
+ * SVG and GIF are returned unchanged (canvas would break them).
+ */
+function resizeImage(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    // Skip formats that shouldn't be rasterised
+    if (file.type === "image/svg+xml" || file.type === "image/gif") {
+      resolve(file);
+      return;
+    }
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const { naturalWidth: w, naturalHeight: h } = img;
+      const longest = Math.max(w, h);
+
+      // Nothing to do if already within the limit
+      if (longest <= MAX_DIMENSION) {
+        resolve(file);
+        return;
+      }
+
+      const scale = MAX_DIMENSION / longest;
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(file); return; }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("Canvas resize failed"));
+        },
+        file.type,
+        0.88, // quality (ignored for PNG)
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Failed to load image for resizing"));
+    };
+
+    img.src = objectUrl;
+  });
+}
 
 interface BannerUploadProps {
   currentUrl: string | null;
@@ -37,9 +93,12 @@ export default function BannerUpload({ currentUrl, onUploaded, linkEndpoint, dis
     setUploading(true);
 
     try {
-      // 1. Upload to Hygraph via our API
+      // 1. Resize client-side: cap longest side to MAX_DIMENSION px before upload
+      const resizedBlob = await resizeImage(file);
+
+      // 2. Upload to Hygraph via our API
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", resizedBlob, file.name);
 
       const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
       if (!uploadRes.ok) {

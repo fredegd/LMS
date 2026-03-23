@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { LayoutGrid, List, ArrowUpDown } from "lucide-react";
 import CategoryFilter from "./_components/CategoryFilter";
-import { getList } from "../../../_services/index";
 import ItemList from "./_components/ItemList";
 import { SnippetPreview } from "../../../../types/hygraph";
 
@@ -82,8 +81,13 @@ function Browse() {
       setIsLoading(true);
       setError("");
 
-      const response = await getList(searchQuery);
-      const snippetCollections = response?.snippetCollections || [];
+      const url = searchQuery
+        ? `/api/content?search=${encodeURIComponent(searchQuery)}`
+        : "/api/content";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to load items");
+      const data = await res.json();
+      const snippetCollections = data.snippetCollections || [];
 
       if (!active) return;
 
