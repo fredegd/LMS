@@ -4,17 +4,24 @@ import { getToken } from "next-auth/jwt";
 
 const PUBLIC_ROUTES = new Set(["/", "/browse", "/sign-in", "/sign-up"]);
 
-const isPublicRoute = (pathname: string) => {
+/** Browse uses GET /api/content; keep /api/content/[id] auth-only (Content API may include non-published). */
+const isPublicContentApiRead = (pathname: string, method: string) => {
+  if (method !== "GET") return false;
+  return pathname === "/api/content" || pathname === "/api/content/";
+};
+
+const isPublicRoute = (pathname: string, req: NextRequest) => {
   if (PUBLIC_ROUTES.has(pathname)) return true;
   if (pathname.startsWith("/item-display/")) return true;
   if (pathname.startsWith("/api/auth")) return true;
+  if (isPublicContentApiRead(pathname, req.method)) return true;
   return false;
 };
 
 export async function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  if (isPublicRoute(pathname)) {
+  if (isPublicRoute(pathname, req)) {
     return NextResponse.next();
   }
 
